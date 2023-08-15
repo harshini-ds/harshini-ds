@@ -1,0 +1,99 @@
+---
+title: "static_maps_shiny_app"
+author: "HARSHINI"
+date: "12/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages}
+##Packages
+library(leaflet)
+library(tmap)
+library(sf)
+library(tidyverse)
+
+```
+
+
+```{r data}
+##Reading data
+sev <-
+  read_csv('data/raw/output_project.csv')
+sierra <-
+  st_read('data/raw/spatial/Ebola_Virus_Outbreak.shp')
+```
+```{r map}
+##Reading data
+sierra %>% 
+  ggplot() + 
+  geom_sf()
+```
+```{r filtering}
+##sierra_data filtering
+sieera_sev <- sev%>%
+                  filter(country == "Sierra Leone")
+
+##converting the csv into spatial object
+sierra_sp <-
+  st_as_sf(
+    sieera_sev,
+    coords = c('X', 'Y'),
+    crs = 4326)
+```
+
+```{r join}
+##Joining shape files
+join<- 
+  st_join(
+  sierra,
+  sierra_sp)
+```
+
+
+```{r plotting 1}
+##Plot
+tm_shape(join)+ 
+  tm_polygons('Cumulative_cases',palette="Reds",title="Total Ebola cases-Sierra Leone")+
+  tm_style("col_blind")+
+tm_layout(legend.outside = TRUE, legend.outside.position = "right", 
+            title= 'Casecount & Gross National Income')+
+  tm_dots(size = 0.5,   ##layer element
+          col = 'Gross_National_Income_per_capita',
+           shapeNA = NA, palette = "viridis", title = "Gross National Income per capita",
+          clustering = TRUE)
+```
+```{r plotting 2 }
+##Plot
+tm_shape(join)+ 
+  tm_polygons('Cumulative_cases',palette="Reds",title="Total Ebola cases-Sierra Leone")+
+  tm_style("col_blind")+
+tm_layout(legend.outside = TRUE, legend.outside.position = "right", 
+            title= 'Casecount & % poorest households')+
+  tm_dots(size = 0.5,   ##layer element
+          col = 'Percentage_poorest_households',
+           shapeNA = NA, palette = "Dark2", title = "% poorest households",
+          clustering = TRUE)
+```
+```{r plotting 3 }
+##Plot
+tm_shape(join)+ 
+  tm_polygons('Cumulative_cases',palette="Reds",title="Total Ebola cases-Sierra Leone")+
+  tm_style("col_blind")+
+tm_layout(legend.outside = TRUE, legend.outside.position = "right", 
+            title= 'Casecount & Education of people')+
+  tm_dots(size = 0.5,   ##layer element
+          col = 'Mean_years_education_population',
+           shapeNA = NA, palette = "Pastel1", title = "Avg years of education of people",
+          clustering = TRUE)
+```
+
+
+
+
+
+
+
